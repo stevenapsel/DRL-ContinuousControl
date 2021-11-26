@@ -9,23 +9,21 @@
 
 ### Algorithm
 
-For this project I implemented the Deep Q-Network as described in the paper: [Human-level control through deep reinforcement
-learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf)
+For this project I implemented the Deep Deterministic Policy Gradient algorithm as described in the paper: [Continuous Control With Deep Reinforcement Learning](https://arxiv.org/abs/1509.02971)
 
-This approach moves beyond standard online Q-Learning in two respects:
-* Experience replay
-* Use a separate network for generating the targets in the Q-learning update
+This approach moves beyond standard online Q-Learning in several respects:
+* It uses an off-policy actor-critic algorithm that can learn policies in high-dimensional, continuous action spaces
+* It leverages experience replay by training off-policy with samples from a buffer to minimize correlation issues
+* Use separate target networks (actor and critic) for generating the targets in the learning update
 
-Both of these improvements help to address instabilities associated with Q-Learning.  The paper describes it as follows:
+These improvements help to address instabilities associated with Q-Learning.  The paper's abstract describes it as follows:
 
-> We address these instabilities with a novel variant of Q-learning, which
-> uses two key ideas. First, we used a biologically inspired mechanism
-> termed experience replay that randomizes over the data, thereby
-> removing correlations in the observation sequence and smoothing over
-> changes in the data distribution. Second, we used
-> an iterative update that adjusts the action-values (Q) towards target
-> values that are only periodically updated, thereby reducing correlations
-> with the target.
+> We adapt the ideas underlying the success of Deep Q-Learning to the continuous
+> action domain. We present an actor-critic, model-free algorithm based on the deterministic 
+> policy gradient that can operate over continuous action spaces. Using
+> the same learning algorithm, network architecture and hyper-parameters, our algorithm robustly 
+> solves more than 20 simulated physics tasks, including classic problems such as 
+> cartpole swing-up, dexterous manipulation, legged locomotion and car driving.
 
 The pseudo-code from the paper is as follows:
 
