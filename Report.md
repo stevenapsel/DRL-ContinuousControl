@@ -1,148 +1,86 @@
-# Udacity Deep Reinforcement Learning Nanodegree Project: Continuous Control
+# DRL-ContinousControl
 
-This is my report for [Udacity Deep Reinforcement Learning Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) Project 2: Continuous Control.
+[//]: # (Image References)
 
-## Project's goal
+[image1]: https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif "Trained Agent"
 
-In this environment, a double-jointed arm can move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of the agent is to maintain its position at the target location for as many time steps as possible.
-
-![In Project 2, train an agent to maintain its position at the target location for as many time steps as possible.](images/reacher.gif)
-
-### Environment details
-
-The environment is based on [Unity ML-agents](https://github.com/Unity-Technologies/ml-agents). Unity ML-Agents is an open-source Unity plugin that enables games and simulations to serve as environments for training intelligent agents.
-
-**Note:** The Unity ML-Agent team frequently releases updated versions of their environment. We are using the v0.4 interface. The project environment provided by Udacity is similar to, but not identical to the [Reacher](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#reacher) environment on the Unity ML-Agents GitHub page.
-
-The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
-
-- Set-up: Double-jointed arm which can move to target locations.
-- Goal: The agents must move it's hand to the goal location, and keep it there.
-- Agents: The environment contains 10 agent with same Behavior Parameters. (The provided Udacity agent versions are Single Agent or 20 Agents.)
-- Agent Reward Function (independent):
-  - +0.1 Each step agent's hand is in goal location.
-- Behavior Parameters:
-  - Vector Observation space: 26 variables corresponding to position, rotation, velocity, and angular velocities of the two arm Rigidbodies.
-  - Vector Action space: (Continuous) Size of 4, corresponding to torque applicable to two joints.
-  - Visual Observations: None.
-- Benchmark Mean Reward: 30
-
-For this project, Udacity provides two separate versions of the Unity environment:
-- The first version contains a single agent.
-- The second version contains 20 identical agents, each with its own copy of the environment.
-
-### Solving the environment
-
-Depending on the chosen environment, there are 2 options to solve the environment:
-
-**Option 1: Solve the First Version**
-
-The task is episodic, and in order to solve the environment, the agent must get an average score of +30 over 100 consecutive episodes. 
-
-**Option 2: Solve the Second Version**
-
-The barrier for solving the second version of the environment is slightly different, to take into account the presence of many agents. In particular, the agents must get an average score of +30 (over 100 consecutive episodes, and over all agents). Specifically:
-    - After each episode, the rewards that each agent received (without discounting) are added up , to get a score for each agent. This yields 20 (potentially different) scores. The average of these 20 scores is then used.
-    - This yields an average score for each episode (where the average is over all 20 agents).
-The environment is considered solved, when the average (over 100 episodes) of those average scores is at least +30.
-
-**In my implementation I have chosen to solve the Second version of the environment (20 Agents) using DDPG algorithm.** 
-
-## Agent Implementation
-
-### Deep Deterministic Policy Gradient (DDPG)
-
-This project implements an *off-policy method* called **Deep Deterministic Policy Gradient** and described in the paper [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971). 
-
-Deep Deterministic Policy Gradient (DDPG) is an algorithm which concurrently learns a Q-function and a policy. It uses off-policy data and the Bellman equation to learn the Q-function, and uses the Q-function to learn the policy.
-
-More explanation and details can be found in OpenAI's [Spinning Up](https://spinningup.openai.com/en/latest/algorithms/ddpg.html) website.
+# Project 1: Navigation
 
 ### Algorithm
 
-![DDPG algorithm from Spinning Up](./images/DDPG.svg)
+For this project I implemented the Deep Q-Network as described in the paper: [Human-level control through deep reinforcement
+learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf)
 
-This algorithm is taken from [DDPG algorithm from the Spinning Up website](https://spinningup.openai.com/en/latest/algorithms/ddpg.html).
+This approach moves beyond standard online Q-Learning in two respects:
+* Experience replay
+* Use a separate network for generating the targets in the Q-learning update
 
-### Code implementation
+Both of these improvements help to address instabilities associated with Q-Learning.  The paper describes it as follows:
 
-The codes consist of 3 files:
+> We address these instabilities with a novel variant of Q-learning, which
+> uses two key ideas. First, we used a biologically inspired mechanism
+> termed experience replay that randomizes over the data, thereby
+> removing correlations in the observation sequence and smoothing over
+> changes in the data distribution. Second, we used
+> an iterative update that adjusts the action-values (Q) towards target
+> values that are only periodically updated, thereby reducing correlations
+> with the target.
 
-- `model.py` : Implement the **Actor** and the **Critic** class.
-    - Both Actor and Critic class implement a *Target* and a *Local* Neural Network for training.
-    
-- `ddpg_agent.py` : Implement the DDPG agent, a Noise and a Replay Buffer class.
-    - The Actor's *Local* and *Target* neural networks, and the Critic's *Local* and *Target* neural networks, the Noise process and the Replay Buffer are instanciated by the Agent's constructor.
-    - The Noise uses Ornstein-Uhlenbeck process.
-    - The Replay Buffer is a fixed-size buffer to store experience tuples.
-  
-- `Continuous_Control.ipynb` : In this Jupyter Notebook file, we can train the agent. More specifically, it is able to:
-  - Import the necessary packages 
-  - Check the state and action spaces
-  - Take random actions in the environment
-  - Train 20 agents using DDPG
-  - Plot the scores/rewards
+The pseudo-code from the paper is as follows:
 
+![alg](screencapture.png)
+
+### Implementation
+
+The code used for this project is heavily based on the solution in the Deep Q-Learning Lunar Lander project.  The key components are as follows:
+
+#### model.py:  
+This file contains the QNetwork class, which implements a pytorch deep neural network that takes input the size of the state space, produces output the size of the action space, and has two hidden layers (with ReLU activation) of configurable size.  For this project, both layers were set to 512 nodes.  As described in the algorithm section, the QNetwork(s) were used for both training and inference at various points.
+
+#### dqn_agent.py:
+This file contains two classes.  The Agent class is the main interface for interacting with and learning from the enviroment.  The Agent delegates to the ReplayBuffer class to store the experience tuples needed for experience replay.  The key methods are described below.
+##### Agent.__init__
+A key feature of this constructor is that it instantiates two QNetworks, qnetwork_local and qnetwork_target.  While qnetwork_local is being trained, qnetwork_target is used to generate stable targets for computing the loss.
+##### Agent.act
+This method returns an action based on the input state.  It makes an epsilon greedy selection based on the prediction from qnetwork_local.  Since epsilon is an input parameter, the training loop can gradually move from exploration to exploitation.
+##### Agent.step
+The training loop will choose an action and provide it to the enviroment.  With the environment's response, we have a full experience (state, action, reward, next_state, done) that can be stored in the ReplayBuffer.  For every UPDATE_EVERY calls to Agent.step, the method will sample BATCH_SIZE samples from the ReplayBuffer and update both QNetworks by calling Agent.learn
+##### Agent.learn
+This method implements the target computation and gradient descent step from the algorithm pseudo-code, with the modification of using an Adam optimizer.  The updated qnetwork_local is then used to gradually update (based on interpolation parameter TAU) the qnetwork_target.
+#### Network.ipynb
+The dqn() method in the notebook is the main training loop.  It uses Agent.act to choose actions, uses the actions to generate experiences from the enviroment, and feeds the experiences to Agent.step, where the learning is triggered after UPDATE_EVERY steps.
 ### Hyperparameters
-
-The DDPG agent uses the following hyperparameters:
-
+The following hyperparameter settings were used:
 ```
-BUFFER_SIZE = int(1e6)  # replay buffer size
-BATCH_SIZE = 128        # minibatch size
+BUFFER_SIZE = int(1e5)  # replay buffer size
+BATCH_SIZE = 64         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
-LR_ACTOR = 1e-4         # learning rate of the actor 
-LR_CRITIC = 1e-3        # learning rate of the critic
-WEIGHT_DECAY = 0        # L2 weight decay
-LEARN_EVERY = 20        # update the networks 10 times after every 20 timesteps
-LEARN_NUMBER = 10       # update the networks 10 times after every 20 timesteps
-EPSILON = 1.0           # noise factor
-EPSILON_DECAY = 0.999999  # noise factor decay
+LR = 5e-4               # learning rate 
+UPDATE_EVERY = 4        # how often to update the network
+```
+The model architecture for the neural network is described above in the model.py section.
 
-n_episodes=1000         # maximum number of episodes to train
-max_t=1000              # maximum number of steps to train per episode
+### Plot of Rewards
+[Navigation.ipynb](https://github.com/stevenapsel/DRL-Navigation/blob/main/Navigation.ipynb) shows the plot of rewards and the number of episodes required.  As shown below, it took 707 episodes to achieve an average score of 13.
+```
+Episode 100	Average Score: 1.12
+Episode 200	Average Score: 4.19
+Episode 300	Average Score: 6.30
+Episode 400	Average Score: 8.56
+Episode 500	Average Score: 10.32
+Episode 600	Average Score: 11.99
+Episode 700	Average Score: 12.51
+Episode 800	Average Score: 12.63
+Episode 807	Average Score: 13.00
+Environment solved in 707 episodes!	Average Score: 13.00
 ```
 
-The **Actor Neural Networks** use the following architecture :
-
-```
-Input Layer (33) ->
-Fully Connected Hidden Layer (400 nodes, Batch Normlization, relu activation) ->
-Fully Connected Hidden Layer (300 nodes, relu activation) ->
-Ouput Layer (4 nodes, tanh activation)
-```
-
-
-The **Critic Neural Networks** use the following architecture :
-
-```
-Input Layer (33) ->
-Fully Connected Hidden Layer (400 nodes, Batch Normlization, relu activation) ->
-Fully Connected Hidden Layer (300+4 nodes [including actions], relu activation) ->
-Ouput Layer (1 node, no activation)
-```
-
-Some important changes:
-
-- I add noise decay factor *EPSILON_DECAY* for the noise factor *EPSILON*.
-- I use gradient clipping when training the critic network `clip_grad_norm_(self.critic_local.parameters(), 1)`.
-- I update the actor and critic networks 10 times after every 20 timesteps.
-
-## Results
-
-With all these hyperparameters and Neural Networks, the result is quite good:
-
-![Training](images/training.PNG)
-
-![Score](images/plot.jpg)
-
-**The result satisfies the goal of this project as the average (over 100 episodes) of those average scores is at least +30, and in 24 episodes only**. 
-
-## Ideas for future work
-
-For the second version of the reacher environment, it might be better to use another algorithm like **D4PG** that use multiple (non-interacting, parallel) copies of the same agent to distribute the task of gathering experience.  
-
-**Distributed Distributional Deterministic Policy Gradients** - [D4PG](https://openreview.net/pdf?id=SyZipzbCb)
-
-> **Abstract**: This work adopts the very successful distributional perspective on reinforcement learning and adapts it to the continuous control setting. We combine this within a distributed framework for off-policy learning in order to develop what we call the Distributed Distributional Deep Deterministic Policy Gradient algorithm, D4PG. We also combine this technique with a number of additional, simple improvements such as the use of N-step returns and prioritized experience replay. Experimentally we examine the contribution of each of these individual components, and show how they interact, as well as their combined contributions. Our results show that across a wide variety of simple control tasks, difficult manipulation tasks, and a set of hard obstacle-based locomotion tasks the D4PG algorithm achieves state of the art performance.
+### Ideas for Future Work
+Here are a few ideas that could improve the training speed and/or performance of the agent.
+#### Hyperparameter Tuning
+The hyperparameters we've used here were fine for completing the project.  Are they optimal?  Probably not.  Some additional exploration could yield better results.
+#### Network Architecture
+We used a fairly simple network in QNetwork.  Further exploration could look at varying the size (or number) of the hidden layers.
+#### Prioritized Experience Replay
+For this project, our replays were uniformly sampled.  What if we could choose sampled from a weighted distribution that gave preference to experiences that are more likely to have an larger impact on learning?  That is the idea behind [prioritized experience replay](https://arxiv.org/abs/1511.05952).
