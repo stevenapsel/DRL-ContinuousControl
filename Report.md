@@ -27,7 +27,25 @@ These improvements help to address instabilities associated with Q-Learning.  Th
 
 The pseudo-code from the paper is as follows:
 
-![alg](screencapture.png)
+![alg](DDPG-Alg.png)
+
+#### Modifications
+
+Initial experiments with the algorithm described in the paper did not yield the desired results.  Although the algorithm was able to learn, it was extremely slow (many hundreds of episodes) and the mean reward plateaued at a score of 10-15.  
+
+After some additional investigation, I came upon a modification to the original DDPG at [OpenAI Spinning Up](https://spinningup.openai.com/en/latest/algorithms/ddpg.html)
+
+This implementation incorporated the following key features that yielded immediate improvements:
+* A learning step to better control the update of the networks relative to the amount of experiences collected
+* Gradient clipping in the critic network
+* A decay term to gradually reduce the introduction of noise as training progresses
+
+The pseudo-code from Spinning Up is as follows:
+
+![alg](SpinningUp-Alg.png)
+
+
+
 
 ### Implementation
 
