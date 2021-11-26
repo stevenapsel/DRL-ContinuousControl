@@ -14,9 +14,9 @@ The environment is based on [Unity ML-agents](https://github.com/Unity-Technolog
 
 The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
 
-- Set-up: Double-jointed arm which can move to target locations.
-- Goal: The agents must move it's hand to the goal location, and keep it there.
-- Agents: The environment contains 10 agent with same Behavior Parameters. (The provided Udacity agent versions are Single Agent or 20 Agents.)
+- Set-up: Double-jointed arm that will move to various locations given actions.
+- Goal: The agents must move the end of the arm to a goal location (i.e. a hand touching a moving ball).
+- Agents: The provided Udacity enviroment allows a Single Agent in a single environment or 20 Agents in 20 environments.
 - Agent Reward Function (independent):
   - +0.1 Each step agent's hand is in goal location.
 - Behavior Parameters:
