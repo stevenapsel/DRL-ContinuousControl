@@ -49,10 +49,12 @@ The pseudo-code from Spinning Up is as follows:
 
 ### Implementation
 
-The code used for this project is heavily based on the solution in the Deep Q-Learning Lunar Lander project.  The key components are as follows:
+The code used for this project is heavily based on the solution in the Udacity Deep Reinforcement Learning github repo, specifically the [ddpg-pedal solution](https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-bipedal).
+
+The key components are as follows:
 
 #### model.py:  
-This file contains the QNetwork class, which implements a pytorch deep neural network that takes input the size of the state space, produces output the size of the action space, and has two hidden layers (with ReLU activation) of configurable size.  For this project, both layers were set to 512 nodes.  As described in the algorithm section, the QNetwork(s) were used for both training and inference at various points.
+This file contains the network classes for the Actor and the Critic.  The networks use rectified non-linearity (ReLU activation) for all the hidden layers.  The final output layre of the actor used tanh activation to keep the actions bounded.  Both networks had hidden layers of 400 and 300.  Both networks apply Batch Normalization after the first hidden layer.  For the Critic, the actions aren't input to the network until the second hidden layer.  The implemenation is nearly an exact match of the description found in Section 7 (Experiment Details) of the Continuous Control paper.
 
 #### dqn_agent.py:
 This file contains two classes.  The Agent class is the main interface for interacting with and learning from the enviroment.  The Agent delegates to the ReplayBuffer class to store the experience tuples needed for experience replay.  The key methods are described below.
