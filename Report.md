@@ -2,7 +2,8 @@
 
 [//]: # (Image References)
 
-[image1]: reacher.gif
+![In Project 2, train an agent to maintain its position at the target location for as many time steps as possible.](./reacher.gif)
+
 
 # Project 1: Continous Control
 
