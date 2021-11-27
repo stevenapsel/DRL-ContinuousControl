@@ -65,7 +65,7 @@ This method returns an action based on the input state.  To encourage exploratio
 ##### Agent.step
 The training loop will choose an action and provide it to the enviroment.  With the environment's response, we have a full experience (state, action, reward, next_state, done) that can be stored in the ReplayBuffer.  For every LEARN_EVERY calls to Agent.step, the method will do the following steps LEARN_NUMBER times: sample BATCH_SIZE samples from the ReplayBuffer and update the Actor and Critic networks by calling Agent.learn.
 ##### Agent.learn
-This method implements the target computation and gradient descent step from the algorithm pseudo-code, with the modification of using an Adam optimizer.  The updated qnetwork_local is then used to gradually update (based on interpolation parameter TAU) the qnetwork_target.
+This method implements steps 12-15 from the algorithm pseudo-code.  One modification is gradient clipping applied to the critic as it is updating.  The updated local networks are used to gradually soft update (based on interpolation parameter TAU) the target networks.
 #### Network.ipynb
 The dqn() method in the notebook is the main training loop.  It uses Agent.act to choose actions, uses the actions to generate experiences from the enviroment, and feeds the experiences to Agent.step, where the learning is triggered after UPDATE_EVERY steps.
 ### Hyperparameters
