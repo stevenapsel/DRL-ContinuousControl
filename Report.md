@@ -68,40 +68,34 @@ The training loop will choose an action and provide it to the enviroment.  With 
 This method implements steps 12-15 from the algorithm pseudo-code.  One modification is gradient clipping applied to the critic as it is updating.  The updated local networks are used to gradually soft update (based on interpolation parameter TAU) the target networks.
 ##### Agent.soft_update
 Allows the target networks to slowly track the parameters of the learned newtorks based on the interpolation factor TAU.  Makes the learn process much more stable.
-#### Network.ipynb
-The dqn() method in the notebook is the main training loop.  It uses Agent.act to choose actions, uses the actions to generate experiences from the enviroment, and feeds the experiences to Agent.step, where the learning is triggered after UPDATE_EVERY steps.
+#### Continuous_Control.ipynb
+The ddpg() method in the notebook is the main training loop.  It uses Agent.act to choose actions for all 20 environments, uses the actions to generate experiences from the enviroment, and feeds the experiences to Agent.step, where the learning is triggered every LEARN_EVERY calls.
 ### Hyperparameters
 The following hyperparameter settings were used:
 ```
-BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
+BUFFER_SIZE = int(1e6)  # replay buffer size
+BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
-LR = 5e-4               # learning rate 
-UPDATE_EVERY = 4        # how often to update the network
+LR_ACTOR = 1e-4         # learning rate of the actor 
+LR_CRITIC = 1e-3        # learning rate of the critic
+WEIGHT_DECAY = 0        # L2 weight decay
+LEARN_EVERY = 20        # Update the networks 10 times after every 20 timesteps
+LEARN_NUMBER = 10       # Update the networks 10 times after every 20 timesteps
+EPSILON = 1.0           # Noise factor
+EPSILON_DECAY = 0.999999  # Noise factor decay
 ```
 The model architecture for the neural network is described above in the model.py section.
 
 ### Plot of Rewards
-[Navigation.ipynb](https://github.com/stevenapsel/DRL-Navigation/blob/main/Navigation.ipynb) shows the plot of rewards and the number of episodes required.  As shown below, it took 707 episodes to achieve an average score of 13.
-```
-Episode 100	Average Score: 1.12
-Episode 200	Average Score: 4.19
-Episode 300	Average Score: 6.30
-Episode 400	Average Score: 8.56
-Episode 500	Average Score: 10.32
-Episode 600	Average Score: 11.99
-Episode 700	Average Score: 12.51
-Episode 800	Average Score: 12.63
-Episode 807	Average Score: 13.00
-Environment solved in 707 episodes!	Average Score: 13.00
-```
+[Continuous_Control.ipynb](https://github.com/stevenapsel/DRL-ContinuousControl/blob/main/Continuous_Control.ipynb) shows the plot of rewards and the number of episodes required.  As shown below, it took 177 episodes to achieve an moving average score  of 30.12 (over a 100 episode window).
+![plot](./score.jpg)
 
 ### Ideas for Future Work
 Here are a few ideas that could improve the training speed and/or performance of the agent.
 #### Hyperparameter Tuning
 The hyperparameters we've used here were fine for completing the project.  Are they optimal?  Probably not.  Some additional exploration could yield better results.
 #### Network Architecture
-We used a fairly simple network in QNetwork.  Further exploration could look at varying the size (or number) of the hidden layers.
+We used a fairly simple network.  Further exploration could look at varying the size (or number) of the hidden layers.
 #### Prioritized Experience Replay
 For this project, our replays were uniformly sampled.  What if we could choose sampled from a weighted distribution that gave preference to experiences that are more likely to have an larger impact on learning?  That is the idea behind [prioritized experience replay](https://arxiv.org/abs/1511.05952).
