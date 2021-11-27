@@ -1,4 +1,4 @@
-# DRL-ContinousControl
+# DRL-ContinuousControl
 
 [//]: # (Image References)
 
