@@ -56,14 +56,14 @@ The key components are as follows:
 #### model.py:  
 This file contains the network classes for the Actor and the Critic.  The networks use rectified non-linearity (ReLU activation) for all the hidden layers.  The final output layre of the actor used tanh activation to keep the actions bounded.  Both networks had hidden layers of 400 and 300.  Both networks apply Batch Normalization after the first hidden layer.  For the Critic, the actions aren't input to the network until the second hidden layer.  The implemenation is nearly an exact match of the description found in Section 7 (Experiment Details) of the Continuous Control paper.
 
-#### dqn_agent.py:
+#### ddpg_agent.py:
 This file contains three classes.  The Agent class is the main interface for interacting with and learning from the enviroment.  The Agent delegates to the ReplayBuffer class to store the experience tuples needed for experience replay.  The third class, OUNoise, uses the Ornstein-Uhlenbeck process to promote exploration in the actions chosen as the Agent moves through the environment.  The key methods are described below.
 ##### Agent.__init__
-A key feature of this constructor is that it instantiates two QNetworks, qnetwork_local and qnetwork_target.  While qnetwork_local is being trained, qnetwork_target is used to generate stable targets for computing the loss.
+A key feature of this constructor is that it instantiates two networks for the Actor and the Critic (4 total), a local and a target.  While the local is being trained, the target is used to generate stable targets for computing the loss.  In both cases, the weights of the target networks are updated by having them slowly track the learned local network.  More on this later.  In addition to the networks, this method initializes the ReplayBuffer and the OUNoise object.
 ##### Agent.act
-This method returns an action based on the input state.  It makes an epsilon greedy selection based on the prediction from qnetwork_local.  Since epsilon is an input parameter, the training loop can gradually move from exploration to exploitation.
+This method returns an action based on the input state.  To encourage exploration, the action predicted by the actor_local newtwork has noise added to it.  The amount of noise will decrease as training progresses.  Lastly, the action is clipped to remain within bounds.
 ##### Agent.step
-The training loop will choose an action and provide it to the enviroment.  With the environment's response, we have a full experience (state, action, reward, next_state, done) that can be stored in the ReplayBuffer.  For every UPDATE_EVERY calls to Agent.step, the method will sample BATCH_SIZE samples from the ReplayBuffer and update both QNetworks by calling Agent.learn
+The training loop will choose an action and provide it to the enviroment.  With the environment's response, we have a full experience (state, action, reward, next_state, done) that can be stored in the ReplayBuffer.  For every LEARN_EVERY calls to Agent.step, the method will do the following steps LEARN_NUMBER times: sample BATCH_SIZE samples from the ReplayBuffer and update the Actor and Critic networks by calling Agent.learn
 ##### Agent.learn
 This method implements the target computation and gradient descent step from the algorithm pseudo-code, with the modification of using an Adam optimizer.  The updated qnetwork_local is then used to gradually update (based on interpolation parameter TAU) the qnetwork_target.
 #### Network.ipynb
